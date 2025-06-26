@@ -157,7 +157,7 @@ func main() {
 	app.Get("/blob", kvService.ServeHTTP, verifyAccess)
 	// use verfyAccess if cfg.Public is false
 	if cfg.Public == "true" {
-		app.Get("/blob/*", kvService.ServeHTTP, verifyAccess)
+		app.Get("/blob/*", kvService.ServeHTTP)
 	} else {
 		app.Get("/blob/*", kvService.ServeHTTP)
 	}
