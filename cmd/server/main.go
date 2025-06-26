@@ -155,7 +155,12 @@ func main() {
 		imagorService.ServeHTTP(w, r)
 	})))
 	app.Get("/blob", kvService.ServeHTTP, verifyAccess)
-	app.Get("/blob/*", kvService.ServeHTTP, verifyAccess)
+	// use verfyAccess if cfg.Public is false
+	if cfg.Public == "true" {
+		app.Get("/blob/*", kvService.ServeHTTP, verifyAccess)
+	} else {
+		app.Get("/blob/*", kvService.ServeHTTP)
+	}
 	app.Put("/blob/*", kvService.ServeHTTP, verifyAccess)
 	app.Delete("/blob/*", kvService.ServeHTTP, verifyAccess)
 	app.Get("/sign/*", signatureService.ServeHTTP, verifyAPIKey)

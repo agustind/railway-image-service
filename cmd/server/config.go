@@ -16,7 +16,7 @@ type Config struct {
 	RequestTimeout time.Duration `env:"REQUEST_TIMEOUT" envDefault:"30s"`
 	// Allowed origins for CORS
 	CORSAllowedOrigins string `env:"CORS_ALLOWED_ORIGINS" envDefault:"*"`
-
+	Public        string `env:"PUBLIC" envDefault:"false"`
 	// The maximum size of a request body in bytes
 	MaxUploadSize int `env:"MAX_UPLOAD_SIZE" envDefault:"10485760"` // 10MB
 	// The path to the directory where uploaded files are stored
