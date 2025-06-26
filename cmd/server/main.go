@@ -159,7 +159,7 @@ func main() {
 	if cfg.Public == "true" {
 		app.Get("/blob/*", kvService.ServeHTTP)
 	} else {
-		app.Get("/blob/*", kvService.ServeHTTP)
+		app.Get("/blob/*", kvService.ServeHTTP, verifyAccess)
 	}
 	app.Put("/blob/*", kvService.ServeHTTP, verifyAccess)
 	app.Delete("/blob/*", kvService.ServeHTTP, verifyAccess)
