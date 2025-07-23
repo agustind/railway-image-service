@@ -154,7 +154,7 @@ func main() {
 		r.URL.RawQuery = q.Encode()
 		imagorService.ServeHTTP(w, r)
 	})))
-	app.Get("/blob", kvService.ServeHTTP, verifyAccess)
+	app.Get("/blob", kvService.ServeHTTP)
 	// use verfyAccess if cfg.Public is false!
 	if cfg.Public == "true" {
 		app.Get("/blob/*", kvService.ServeHTTP)
