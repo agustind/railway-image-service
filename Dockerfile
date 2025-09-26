@@ -74,13 +74,12 @@ RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && \
     apt-get install --no-install-recommends -y \
     ca-certificates procps curl \
-    libglib2.0-0 libjpeg62-turbo libpng16-16 libopenexr-3-1-30 \
+    libglib2.0-0 libgobject-2.0-0 libgio-2.0-0 \
+    libjpeg62-turbo libpng16-16 \
     libwebp7 libwebpmux3 libwebpdemux2 libtiff6 libexif12 \
-    libxml2 libpoppler-glib8 libpango1.0-0 libmatio11 \
-    libopenslide0 libopenjp2-7 libjemalloc2 libgsf-1-114 \
-    libfftw3-bin liborc-0.4-0 librsvg2-2 libcfitsio10 \
-    libimagequant0 libaom3 libheif1 libspng0 libcgif0 && \
-    ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
+    libxml2 libpoppler-glib8 libpango1.0-0 \
+    libopenjp2-7 libjemalloc2 libgsf-1-114 \
+    libfftw3-bin liborc-0.4-0 librsvg2-2 && \
     ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
