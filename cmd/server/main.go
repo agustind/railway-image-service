@@ -105,7 +105,7 @@ func main() {
 		log.Warn("no secret key provided, API key verification is disabled")
 	}
 
-	verifyAPIKey := mw.NewVerifyAPIKey(cfg.SecretKey)
+	
 	verifyAccess := mw.NewVerifyAccess(cfg.SecretKey, cfg.SignatureSecretKey)
 	app.Use(mw.NewRealIP())
 	app.Use(helmet.New(helmet.Config{
