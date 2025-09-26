@@ -66,8 +66,10 @@ LABEL org.opencontainers.image.source="https://github.com/jaredLunde/railway-ima
       org.opencontainers.image.description="Image processing service with libvips" \
       maintainer="jared.lunde@gmail.com"
 
+# Copy vips libraries
 COPY --from=build /usr/local/lib /usr/local/lib
 
+# Install runtime dependencies
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -79,23 +81,33 @@ RUN DEBIAN_FRONTEND=noninteractive \
     libfftw3-bin liborc-0.4-0 librsvg2-2 libcfitsio10 \
     libimagequant0 libaom3 libheif1 libspng0 libcgif0 && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
+    ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     update-ca-certificates 2>/dev/null || true
 
-COPY --chown=nonroot:nonroot --from=build /go/bin/app .
-RUN addgroup --system nonroot && \
-    adduser --system --ingroup nonroot nonroot && \
+# Create user first (DEBIAN commands)
+RUN groupadd --system nonroot && \
+    useradd --system --gid nonroot nonroot
+
+# Create required directories and set permissions
+RUN mkdir -p /app/data/uploads /app/data/db && \
     chown -R nonroot:nonroot /app
+
+# Copy application with correct ownership
+COPY --from=build --chown=nonroot:nonroot /go/bin/app ./app
+RUN chmod +x ./app
 
 ENV VIPS_WARNING=0 \
     MALLOC_ARENA_MAX=2 \
     LD_PRELOAD=/usr/local/lib/libjemalloc.so \
     PORT=8080 \
     GOGC=100 \
-    GOMAXPROCS=4
+    GOMAXPROCS=4 \
+    UPLOAD_PATH=/app/data/uploads \
+    LEVELDB_PATH=/app/data/db
+
+USER nonroot
 
 EXPOSE ${PORT}
-USER nonroot:nonroot
-
-ENTRYPOINT ["/app/app"]
+ENTRYPOINT ["./app"]
