@@ -105,7 +105,7 @@ func main() {
 		log.Warn("no secret key provided, API key verification is disabled")
 	}
 
-	verifyAPIKey := mw.NewVerifyAPIKey(cfg.SecretKey)
+	
 	verifyAccess := mw.NewVerifyAccess(cfg.SecretKey, cfg.SignatureSecretKey)
 	app.Use(mw.NewRealIP())
 	app.Use(helmet.New(helmet.Config{
@@ -163,7 +163,7 @@ func main() {
 	}
 	app.Put("/blob/*", kvService.ServeHTTP, verifyAccess)
 	app.Delete("/blob/*", kvService.ServeHTTP, verifyAccess)
-	app.Get("/sign/*", signatureService.ServeHTTP, verifyAPIKey)
+	app.Get("/sign/*", signatureService.ServeHTTP)
 
 	g := errgroup.Group{}
 	g.Go(func() error {
