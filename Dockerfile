@@ -58,59 +58,29 @@ ARG TARGETARCH
 COPY . .
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags="-s -w" -o /go/bin/app ./cmd/server
 
-FROM debian:stable-slim
+# Use imagor base image which already has all vips dependencies
+FROM ghcr.io/cshum/imagor:latest
 WORKDIR /app
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 LABEL org.opencontainers.image.source="https://github.com/jaredLunde/railway-image-service" \
       org.opencontainers.image.description="Image processing service with libvips" \
       maintainer="jared.lunde@gmail.com"
 
-# Copy vips libraries
-COPY --from=build /usr/local/lib /usr/local/lib
+# Create required directories
+RUN mkdir -p /app/data/uploads /app/data/db
 
-# Install runtime dependencies
-RUN DEBIAN_FRONTEND=noninteractive \
-    apt-get update && \
-    apt-get install --no-install-recommends -y \
-    ca-certificates procps curl \
-    libglib2.0-0 libgobject-2.0-0 libgio-2.0-0 \
-    libjpeg62-turbo libpng16-16 \
-    libwebp7 libwebpmux3 libwebpdemux2 libtiff6 libexif12 \
-    libxml2 libpoppler-glib8 libpango1.0-0 \
-    libopenjp2-7 libjemalloc2 libgsf-1-114 \
-    libfftw3-bin liborc-0.4-0 librsvg2-2 && \
-    ldconfig && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    update-ca-certificates 2>/dev/null || true
-
-# Create user first (DEBIAN commands)
-RUN groupadd --system nonroot && \
-    useradd --system --gid nonroot nonroot
-
-# Create required directories and set permissions
-RUN mkdir -p /app/data/uploads /app/data/db && \
-    chown -R nonroot:nonroot /app
-
-# Copy application with correct ownership
-COPY --from=build --chown=nonroot:nonroot /go/bin/app ./app
+# Copy your compiled app
+COPY --from=build --chown=nobody:nogroup /go/bin/app ./app
 RUN chmod +x ./app
 
-# Debug: Check what vips libraries are available
-RUN ls -la /usr/local/lib/libvips* || true
-RUN ldd ./app || true
-
-ENV VIPS_WARNING=0 \
-    MALLOC_ARENA_MAX=2 \
-    LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
+ENV UPLOAD_PATH=/app/data/uploads \
+    LEVELDB_PATH=/app/data/db \
     PORT=8080 \
+    VIPS_WARNING=0 \
     GOGC=100 \
-    GOMAXPROCS=4 \
-    UPLOAD_PATH=/app/data/uploads \
-    LEVELDB_PATH=/app/data/db
+    GOMAXPROCS=4
 
-USER nonroot
+USER nobody
 
 EXPOSE ${PORT}
 ENTRYPOINT ["./app"]
