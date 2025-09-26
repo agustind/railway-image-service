@@ -84,8 +84,8 @@ RUN DEBIAN_FRONTEND=noninteractive \
     update-ca-certificates 2>/dev/null || true
 
 COPY --chown=nonroot:nonroot --from=build /go/bin/app .
-RUN groupadd --system nonroot && \
-    useradd --system --gid nonroot nonroot && \
+RUN addgroup --system nonroot && \
+    adduser --system --ingroup nonroot nonroot && \
     chown -R nonroot:nonroot /app
 
 ENV VIPS_WARNING=0 \
