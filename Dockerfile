@@ -84,9 +84,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
     update-ca-certificates 2>/dev/null || true
 
 COPY --chown=nonroot:nonroot --from=build /go/bin/app .
-RUN addgroup --system nonroot && \
-    adduser --system --ingroup nonroot nonroot && \
-    chown -R nonroot:nonroot /app
+# RUN addgroup --system nonroot && \
+#     adduser --system --ingroup nonroot nonroot && \
+#     chown -R nonroot:nonroot /app
 
 ENV VIPS_WARNING=0 \
     MALLOC_ARENA_MAX=2 \
