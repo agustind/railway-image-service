@@ -98,9 +98,13 @@ RUN mkdir -p /app/data/uploads /app/data/db && \
 COPY --from=build --chown=nonroot:nonroot /go/bin/app ./app
 RUN chmod +x ./app
 
+# Debug: Check what vips libraries are available
+RUN ls -la /usr/local/lib/libvips* || true
+RUN ldd ./app || true
+
 ENV VIPS_WARNING=0 \
     MALLOC_ARENA_MAX=2 \
-    LD_PRELOAD=/usr/local/lib/libjemalloc.so \
+    LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
     PORT=8080 \
     GOGC=100 \
     GOMAXPROCS=4 \
